@@ -1,4 +1,3 @@
-from json.decoder import JSONDecodeError
 from os import error
 import requests
 import random
@@ -16,14 +15,9 @@ import operator
 # df_t = pd.DataFrame(text)
 # df_t.to_csv('test.csv',index=False)
 
-df = pd.read_csv('test.csv')
+tck_cik_list = pd.read_csv('tck_cik_list.csv')
 
-
-# for index, row in df.iterrows():
-#     print(row["CIK"])
-# all_tickers = df.get("Ticker")
-# all_tickers = df.iloc("Ticker")
-#first 0 last 12836
+#first 0 last 12836 columns in csv
 
 def get_proxies():
     url = f'https://free-proxy-list.net/'
@@ -36,7 +30,7 @@ def get_proxies():
 
     return modal_text_clean
 
-def ChangeUrl(search_ticker):
+def ChangeFilingsUrl(search_ticker):
     # url = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{search_ticker}.json'
 
     url = f'https://data.sec.gov/submissions/CIK{search_ticker}.json'
@@ -53,21 +47,22 @@ def TenDigitsCik(current_cik):
     else :
        new_cik = CIK_str.zfill(10)
     return new_cik
- 
-for position in range(0, 1):
+
+#look for each company in the csv
+for company in range(0, 1):
     time.sleep(1/10)
 
-    CIK = df.at[position,"CIK"]
-    Ticker = df.at[position,"Ticker"]
+    CIK = tck_cik_list.at[company,"CIK"]
+    Ticker = tck_cik_list.at[company,"Ticker"]
 
     new_CIK = TenDigitsCik(CIK)
     
-    new_url = ChangeUrl(new_CIK)
+    new_url = ChangeFilingsUrl(new_CIK)
     
     new_page = requests.get(new_url)
 
     call_status = new_page.status_code
-
+#try to connect to the api
     while call_status != 200 :
         time.sleep(1/5)
         new_page = requests.get(new_url)
@@ -76,7 +71,7 @@ for position in range(0, 1):
         print('error')
         if call_status == 200 :
             page_to_json = new_page.json()
-            
+#retreive info from api
             filings = page_to_json['filings']['recent']
 
             # fields = 'accessionNumber' , 'filingDate', 'reportDate', 'form', 'primaryDocument', 'primaryDocDescription'
@@ -88,9 +83,11 @@ for position in range(0, 1):
             # primaryDocument = filings['primaryDocument']
             # primaryDocDescription = filings['primaryDocDescription']
 
-
+#api's info to csv
             dataframe = pd.DataFrame(filings) 
             company_filings_csv = dataframe.to_csv(Ticker+'.csv')
+
+            filings_list_csv = pd.read_csv(company_filings_csv)
 
             print('listo')
 
