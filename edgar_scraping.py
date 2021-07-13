@@ -48,6 +48,14 @@ def TenDigitsCik(current_cik):
        new_cik = CIK_str.zfill(10)
     return new_cik
 
+#User Agent info
+headers = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    
+    'Accept-Encoding': 'gzip, deflate'
+}
+
+
 #look for each company in the csv
 for company in range(0, 1):
     time.sleep(1/10)
@@ -59,13 +67,13 @@ for company in range(0, 1):
     
     new_url = ChangeFilingsUrl(new_CIK)
     
-    new_page = requests.get(new_url)
+    new_page = requests.get(new_url, headers=headers)
 
     call_status = new_page.status_code
 #try to connect to the api
     while call_status != 200 :
         time.sleep(1/5)
-        new_page = requests.get(new_url)
+        new_page = requests.get(new_url, headers=headers)
 
         call_status = new_page.status_code
         print('error')
