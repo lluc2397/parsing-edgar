@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "scpvenv/bin/python"
+    "python.pythonPath": "prsvenv/bin/python",
+    "git.ignoreLimitWarning": true
 }
